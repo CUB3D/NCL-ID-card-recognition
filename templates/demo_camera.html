@@ -1,0 +1,61 @@
+<body>
+    <video id="Vid" width="1280" height="720"></video>
+    <button id="snap">Take picture</button>
+    <button id="resend">Resend</button>
+    <canvas id="canvas" width="1280" height="720"></canvas>
+
+    <script>
+        var v = document.getElementById("Vid");
+        navigator.mediaDevices.getUserMedia({video: true}).then(function (value) {
+            v.srcObject = value;
+            v.play();
+        });
+
+        var c = document.getElementById("canvas");
+        var co = c.getContext("2d");
+
+
+        document.getElementById("snap").addEventListener("click", function (ev) {
+            co.drawImage(v, 0, 0, 640, 480);
+
+
+            var http = new XMLHttpRequest();
+            var url = '/app/demo_camera/submit';
+            var dataurl = c.toDataURL("image/jpeg");
+            // Make the url websafe
+            dataurl = dataurl.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+            var params = 'img=' + dataurl;
+            http.open('POST', url, true);
+
+//Send the proper header information along with the request
+            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            http.onreadystatechange = function() {//Call a function when the state changes.
+                if(http.readyState == 4 && http.status == 200) {
+                    alert(http.responseText);
+                }
+            }
+            http.send(params);
+        })
+
+        document.getElementById("resend").addEventListener("click", function (ev) {
+            var http = new XMLHttpRequest();
+            var url = '/app/demo_camera/submit';
+            var dataurl = c.toDataURL("image/jpeg");
+            dataurl = dataurl.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            var params = 'img=' + dataurl;
+            http.open('POST', url, true);
+
+//Send the proper header information along with the request
+            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            http.onreadystatechange = function() {//Call a function when the state changes.
+                if(http.readyState == 4 && http.status == 200) {
+                    alert(http.responseText);
+                }
+            }
+            http.send(params);
+        })
+    </script>
+</body>
